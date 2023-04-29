@@ -1,5 +1,10 @@
 from django.shortcuts import render
 from .models import item,categories
+from django.views import View
+from .forms import CustomerRegistrationForm,authentication
+from django.contrib import messages
+
+
 
 def home(request):
  products = item.objects.all()
@@ -30,11 +35,26 @@ def change_password(request):
 def mobile(request):
  return render(request, 'app/mobile.html')
 
-def login(request):
- return render(request, 'app/login.html')
+# def login(request):
+#  return render(request, 'app/login.html')
+class login (View):
+ def get(request):
+  pass
 
-def customerregistration(request):
- return render(request, 'app/customerregistration.html')
+# def customerregistration(request):
+#  return render(request, 'app/customerregistration.html')
+
+class customerregistration(View):
+ def get (self, request):
+  form = CustomerRegistrationForm()
+  return render(request, 'app/customerregistration.html', {'form': form})
+ def post(self, request):
+  form = CustomerRegistrationForm(request.POST)
+  print(request.POST['email'])
+  if form.is_valid():
+   messages.success(request,'User registered successful')
+   form.save()
+  return render(request, 'app/customerregistration.html', {'form': form})
 
 def checkout(request):
  return render(request, 'app/checkout.html')
