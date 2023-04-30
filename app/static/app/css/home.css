@@ -1,0 +1,13 @@
+.owl-carousel a{
+    color : black;
+
+}
+.owl-carousel img:hover{
+    transform:scale(1.2);
+    z-index: 3;
+  }
+  .owl-carousel a:hover{
+    color : red;
+    margin-top: 10px;
+
+}
