@@ -17,6 +17,7 @@
      </div>
    {% endfor %}
    {% endfor %}
+   {% endif %}
      {% for fm in form %}
      <div class="form-group ">
         {{fm.label_tag}}{{fm}} <small class="text-danger"> {{fm.errors| striptags}}</small> <br>
@@ -27,7 +28,7 @@
      <input type="submit" class = "btn btn-primary mt-4" value="Login" ><br><br><br>
 
   
-      {% endif %}
+      
      <div class="text-center text-primary fw-bold">
         <small>Don't have account? <a href="{%url 'customerregistration'%}" class="text-danger ">Register here</a></small></div>
         {% if form.non_field_errors %}
