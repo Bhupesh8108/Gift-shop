@@ -3,6 +3,7 @@ from .models import item,categories
 from django.views import View
 from .forms import CustomerRegistrationForm,authentication
 from django.contrib import messages
+from django.contrib.auth.models import User
 
 
 
@@ -50,10 +51,19 @@ class customerregistration(View):
   return render(request, 'app/customerregistration.html', {'form': form})
  def post(self, request):
   form = CustomerRegistrationForm(request.POST)
-  print(request.POST['email'])
-  if form.is_valid():
-   messages.success(request,'User registered successfully')
-   form.save()
+  if form.is_valid():    
+    user = form.save(commit=False)
+    email = form.cleaned_data['email']
+    if "@gmail.com" not in email and len(email)<13:
+     messages.warning(request,'invalid email address')
+    else:
+      if User.objects.filter(email = email).exists():
+       messages.warning(request,"Email already used")
+      else:
+        user.email = email
+        user.save()
+        messages.success(request,'User registered successfully')
+
   return render(request, 'app/customerregistration.html', {'form': form})
 
 def checkout(request):
