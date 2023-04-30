@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import item,categories,cart
+from .models import item,categories
 from django.views import View
 from .forms import CustomerRegistrationForm,authentication
 from django.contrib import messages

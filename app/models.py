@@ -21,13 +21,6 @@ class item(models.Model):
     offer_price = models.IntegerField(default=0)
     category = models.CharField(choices=categories,max_length=20)
     id = models.AutoField(primary_key=True)
-    
     def __str__(self):
         return self.name 
     
-class cart(models.Model):
-    user_id = models.ForeignKey(User,on_delete=models.CASCADE)
-    Product = models.ForeignKey(item, on_delete=models.CASCADE)
-    Quantity = models.PositiveIntegerField(default=1)
-    def __str__(self):
-        return str(self.User)
