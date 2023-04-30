@@ -52,7 +52,7 @@ class customerregistration(View):
   form = CustomerRegistrationForm(request.POST)
   print(request.POST['email'])
   if form.is_valid():
-   messages.success(request,'User registered successful')
+   messages.success(request,'User registered successfully')
    form.save()
   return render(request, 'app/customerregistration.html', {'form': form})
 

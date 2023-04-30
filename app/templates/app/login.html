@@ -9,6 +9,14 @@
    <hr>
    <form action="" method="post" novalidate class="shadow p-5">
     {% csrf_token %}
+    {% if form.errors %}
+    {% for field,errors in form.errors.items %}
+    {% for error in errors %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">{{error}}
+       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+     </div>
+   {% endfor %}
+   {% endfor %}
      {% for fm in form %}
      <div class="form-group ">
         {{fm.label_tag}}{{fm}} <small class="text-danger"> {{fm.errors| striptags}}</small> <br>
@@ -17,12 +25,7 @@
      <small><a href=""> Forgot password</a></small><br>
    
      <input type="submit" class = "btn btn-primary mt-4" value="Login" ><br><br><br>
-     {% if form.errors %}
-      {% for field,errors in form.errors.items %}
-      {% for error in errors %}
-     <p class = "alert alert-danger">{{error}}</p>
-     {% endfor %}
-     {% endfor %}
+
   
       {% endif %}
      <div class="text-center text-primary fw-bold">
