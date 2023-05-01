@@ -1,6 +1,8 @@
 {% extends 'app/base.html' %}
 {% load static %}
 {% block title %}Product Detail{% endblock title %}
+<link rel="stylesheet" href="{% static '/app/css/home.css'%}">
+
 {% block main-content %}
 {% for message in messages %}
 <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">{{message}}
@@ -17,18 +19,42 @@
    <p>{{prod.description}}</p> <br>
  
    <h4>{{prod.price}} {% if prod.offer_price > 0 %}<small class="fw-light text-decoration-line-through">{{prod.offer_price}}</small>{% endif %}</h4> <br>
+   {% if request.user.is_authenticated %}
    <form action="" class="d-inline">
     <input type="hidden" name="product_id" value ={{prod.id}} id = "product_id">
     <button type="submit" class="btn btn-primary shadow px-5 py-2"> Add to cart</button>
    </form>
    <a href="{% url 'buy-now' %}" class="btn btn-danger shadow px-5 py-2 ms-4">Buy Now</a>
-   <h5 class="mt-5">Available Offers</h5>
-   <ul>
+   {% else  %}
+   <form action="/login" class="d-inline">
+    <input type="hidden" name="product_id" value ={{prod.id}} id = "product_id">
+    <button type="submit" class="btn btn-primary shadow px-5 py-2">Add to cart</button>
+   <button type="submit" class="btn btn-danger shadow px-5 py-2 ms-4">Buy Now</button>
+
+   </form>
+{% endif %}
+<!-- <a href="{% url 'login' %}" class="btn btn-danger shadow px-5 py-2 ms-4">Buy Now</a> -->
+
+   <!-- <h5 class="mt-5">Available Offers</h5> -->
+  <br><br> 
+  <div class="m-3">
+    <h2>You may like</h2>
+    <!-- Slider 1 -->
+    <div class="owl-carousel" id="slider1">
+     {% for product in products %}
+     
+   <a href="{{product.id}}" class = "text-decoration-none">
+     <div class="item"><img src="/media/{{ product.image }}" alt="" ><br><span class="fw-bold">{{product.name}}</span><br><p>{{product.price}} {% if product.offer_price > 0 %}<small class="fw-light text-decoration-line-through">{{product.offer_price}}</small>{% endif %}</p> <br></div></a>
+   
+     {% endfor %}
+    </div>
+   </div>
+   <!-- <ul>
     <li>Bank Offer 5% Unlimited Cashback on Nic Asia Credit card</li>
     <li>Special Price Get extra Rs3000 off (price inclusive of discount)</li>
     <li>No cost EMI Rs1,667/month. Standard EMI also available</li>
     <li>Partner Offer Rs2000 Flipkart Gift Card on Every 1000th Transaction with a new Visa Debit/Credit Card</li>
-   </ul>
+   </ul> -->
   </div>
  </div>
 </div>
