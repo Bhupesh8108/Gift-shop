@@ -1,9 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render,get_object_or_404,HttpResponse
 from .models import item,categories,wishlist
 from django.views import View
 from .forms import CustomerRegistrationForm,authentication
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.http import JsonResponse
+
+
+
+
 
 
 
@@ -21,7 +26,7 @@ def product_detail(request,id):
  try:
   product_id = request.GET.get('product_id')
   product = item.objects.get(id = product_id)
-  if wishlist.objects.filter(product=product).exists():
+  if wishlist.objects.filter(product=product,user=request.user).exists():
    messages.warning(request,"Product is already in cart")
   else:
     wishlist(user=user, product=product,quantity=1).save()
@@ -34,19 +39,56 @@ def product_detail(request,id):
 
 
 
-def add_to_cart(request):
+
+def update_price(request):
   user = request.user
   cart_items = wishlist.objects.filter(user=user)
+  price = 0
+  for cart_item in cart_items:
+    price += int(cart_item.product.price) * int(cart_item.quantity)
+  return price,cart_items
+
+
+
+def add_to_cart(request):
   try:
    cart_id = request.GET.get('cart_id')
    wishlist.objects.filter(id=cart_id).delete()
   except:
    pass
-  price = 0
-  for cart_item in cart_items:
-    price += int(cart_item.product.price) * int(cart_item.quantity)
-  return render(request, 'app/addtocart.html',{'cart_items': cart_items,'price': float(price,),'total':float(price+50)})
+  price,cart_items =update_price(request)
+  return render(request, 'app/addtocart.html',{'cart_items': cart_items,'price': float(price),'total':float(price+50)})
 
+
+
+def pluscart(request):
+  if request.method == 'GET':
+   pid = request.GET.get('produc_id')
+   if pid:
+    items = get_object_or_404(wishlist,product=pid,user=request.user)
+    items.quantity += 1
+    items.save()
+    price,cart_items = update_price(request)
+    data = {'quantity':items.quantity,
+            'price':price,
+            'total':price+50}
+    return JsonResponse(data)
+   
+
+
+def minuscart(request):
+ if request.method == 'GET':
+   pid = request.GET.get('produc_id')
+   if pid:
+    items = get_object_or_404(wishlist,product=pid,user=request.user)
+    items.quantity -= 1
+    items.save()
+    price,_ = update_price(request)
+    data = {'quantity':items.quantity,
+            'price':price,
+            'total':price+50}
+    return JsonResponse(data)
+  
 
 
 
