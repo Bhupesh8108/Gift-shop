@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import item
+from .models import item,wishlist
 admin.site.register(item)
-# admin.site.register(cart)
+admin.site.register(wishlist)
 # Register your models here.

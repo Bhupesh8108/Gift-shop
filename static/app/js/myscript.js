@@ -21,3 +21,8 @@ $('#slider1, #slider2, #slider3').owlCarousel({
         }
     }
 })
+
+$('.plus-cart').click(function() {
+    var id = $(this).attr('pid').toSring();
+    console.log(id)
+})
