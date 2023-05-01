@@ -22,7 +22,41 @@ $('#slider1, #slider2, #slider3').owlCarousel({
     }
 })
 
+
 $('.plus-cart').click(function() {
-    var id = $(this).attr('pid').toSring();
-    console.log(id)
+    var id = $(this).attr("value").toString();
+    var eml = this.parentNode.children[2]
+
+    $.ajax({
+        type:"GET",
+        url:"/pluscart",
+        data:{
+            "produc_id":id 
+        },
+        success: function(data) {
+            eml.innerText = data.quantity;
+        document.getElementById("amount").innerText = data.price;
+    document.getElementById("total").innerText = data.total;}
+    })
 })
+
+
+$('.minus-cart').click(function() {
+    var id = $(this).attr("value").toString();
+    console.log(id);
+    var eml = this.parentNode.children[2]
+
+    $.ajax({
+        type:"GET",
+        url:"/minuscart",
+        data:{
+            "produc_id":id 
+        },
+        success: function(data) {
+            console.log(data);
+            eml.innerText = data.quantity;
+        document.getElementById("amount").innerText = data.price;
+    document.getElementById("total").innerText = data.total;}
+    })
+})
+
