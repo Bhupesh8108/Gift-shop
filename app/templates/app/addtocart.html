@@ -9,6 +9,7 @@
   <div class="card">
    <div class="card-body">
     <h3>Cart</h3>
+    {% if cart_items %}
     {% for item in cart_items %}
     <div class="row">
      <div class="col-sm-3 text-center align-self-center"><img src="/media/{{item.product.image}}" alt="" srcset="" class="img-fluid img-thumbnail shadow-sm" height="150" width="150"> </div>
@@ -67,7 +68,6 @@
     </div>
    </div>
   </div>
-  
  </div>
 </div>
 <div class="container">
@@ -82,4 +82,11 @@
   </div>
  </div>
 </div>
+{% else %} <hr>
+<h1> Your cart is empty </h1>
+<a href="/" type="button" class = " btn btn-primary"> Explore products</a>
+<div class="col-sm-3 text-center align-self-center"> <img src="{% static 'app/images/emptycart.png'%}" alt="..." class="img-fluid"></div>
+
+{% endif %}
+
 {% endblock main-content %}

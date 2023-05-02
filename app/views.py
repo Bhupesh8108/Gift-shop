@@ -6,7 +6,8 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.contrib.auth.views import LoginView,PasswordChangeView
-
+from ipware import get_client_ip 
+from ip2geotools.databases.noncommercial import DbIpCity
 
 
 
@@ -25,6 +26,16 @@ def product_detail(request,id):
  prod = item.objects.filter(id=id).first()
  products = item.objects.all()
  user = request.user
+ ip,routable = get_client_ip(request)
+ print(ip)
+ if ip is None:
+  ip = '0.0.0.0'
+
+ try:
+  response = DbIpCity.get(ip,api_key="free")
+ except:
+  response = None
+ print(response)
  try:
   product_id = request.GET.get('product_id')
   product = item.objects.get(id = product_id)
@@ -163,8 +174,11 @@ def orders(request):
 
 
 
+
+
+
 def change_password(request):
-  return PasswordChangeView.as_view(template_name='app/changepassword.html', form_class=password_change,success_url='/changepassword')(request)
+  return PasswordChangeView.as_view(template_name='app/changepassword.html', form_class=password_change,success_url='/')(request)
  
 
 

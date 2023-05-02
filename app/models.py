@@ -30,5 +30,6 @@ class wishlist(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     product = models.ForeignKey(item, on_delete=models.CASCADE)
     quantity = models.IntegerField(default = 1)
+    ip = models.CharField(max_length=500,default="0.0.0.0")
     def __str__(self):
         return f'{self.product} by {self.user}'
