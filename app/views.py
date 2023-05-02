@@ -1,11 +1,11 @@
 from django.shortcuts import render,get_object_or_404,HttpResponse,redirect
 from .models import item,categories,wishlist
 from django.views import View
-from .forms import CustomerRegistrationForm,authentication
+from .forms import CustomerRegistrationForm,authentication,password_change
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import JsonResponse
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView,PasswordChangeView
 
 
 
@@ -164,7 +164,8 @@ def orders(request):
 
 
 def change_password(request):
- return render(request, 'app/changepassword.html')
+  return PasswordChangeView.as_view(template_name='app/changepassword.html', form_class=password_change,success_url='/changepassword')(request)
+ 
 
 
 

@@ -42,10 +42,11 @@
     <!-- Slider 1 -->
     <div class="owl-carousel" id="slider1">
      {% for product in products %}
+     {% if product.category == prod.category and prod.id != product.id %}
      
-   <a href="{{product.id}}" class = "text-decoration-none">
+   <a href="{{product.id}}" class = "text-decoration-none ">
      <div class="item"><img src="/media/{{ product.image }}" alt="" ><br><span class="fw-bold">{{product.name}}</span><br><p>{{product.price}} {% if product.offer_price > 0 %}<small class="fw-light text-decoration-line-through">{{product.offer_price}}</small>{% endif %}</p> <br></div></a>
-   
+    {% endif %}
      {% endfor %}
     </div>
    </div>

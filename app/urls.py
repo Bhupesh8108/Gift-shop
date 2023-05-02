@@ -2,7 +2,7 @@ from django.urls import path
 from app import views
 from django.conf import settings
 from django.conf.urls.static import static
-from .forms import authentication
+from .forms import authentication,password_change
 from django.contrib.auth import views as auth_views
 urlpatterns = [
     path('', views.home,name='home'),
@@ -12,7 +12,7 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('address/', views.address, name='address'),
     path('orders/', views.orders, name='orders'),
-    path('changepassword/', views.change_password, name='changepassword'),
+    path('changepassword/', views.change_password , name='changepassword'),
     path('mobile/', views.mobile, name='mobile'),
     path('login/', views.login, name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
