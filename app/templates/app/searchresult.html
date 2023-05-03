@@ -1,0 +1,25 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}search{% endblock title %}
+{% block main-content %}
+<div class="m-3">
+    
+    <!-- Slider 1 -->
+    {% if search_items %}
+    <h2>Search Result for : {{searchtext}}</h2>
+    <div class="owl-carousel" id="slider1">
+     {% for product in search_items %}
+   <a href="/product-detail/{{product.id}}" class = "text-decoration-none">
+     <div class="item"><img src="/media/{{ product.image }}" alt="" ><br><span class="fw-bold">{{product.name}}</span><br><p>{{product.price}} {% if product.offer_price > 0 %}<small class="fw-light text-decoration-line-through">{{product.offer_price}}</small>{% endif %}</p> <br></div></a>
+    
+   
+     {% endfor %}
+     {% else %}
+     <h2>No prouct found {{searchtext}}</h2>
+     {% endif %}
+   </div></div>
+
+
+
+
+{% endblock %}

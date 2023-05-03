@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User 
+from django.core.validators import MaxValueValidator,MinValueValidator
 import os
 categories = [
     ('Birthday', 'hbd'),
@@ -42,7 +43,7 @@ class customer(models.Model):
     street_address= models.CharField(max_length=200)
     additional_address = models.CharField(max_length=200)
     country = models.CharField(max_length=20 , default='unknown')
-    phone_number = models.IntegerField()
+    phone_number = models.IntegerField(validators=[MaxValueValidator(9999999999),MinValueValidator(9000000000)])
     def __str__ (self):
       return f'{self.name} {self.user}  {self.country}'
     
@@ -53,6 +54,13 @@ class order(models.Model):
     address = models.ForeignKey(customer,on_delete=models.CASCADE)
     product = models.ForeignKey(item, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
     # country = models.ForeignKey(customer, on_delete=models.CASCADE)
     def __str__(self):
-        return f'{self.product} by {self.user}'
+        return f'{self.product} by {self.user}Rs.{self.price}'
+
+
+class search(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    searchtext = models.TextField()
+    datetime = models.DateTimeField(auto_now=True)

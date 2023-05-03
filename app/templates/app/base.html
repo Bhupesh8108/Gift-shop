@@ -52,17 +52,19 @@
              </ul>
            </li>
          </ul>
-         <form class="d-flex">
-           <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-           <button class="btn btn-warning" type="submit">S</button>
+         <form class="d-flex" action="{% url 'searchresult'%}">
+           <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search">
+           <button class="btn" type="submit">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32"><path d="M11 2C15.968 2 20 6.032 20 11C20 15.968 15.968 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2ZM11 18C14.8675 18 18 14.8675 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18ZM19.4853 18.0711L22.3137 20.8995L20.8995 22.3137L18.0711 19.4853L19.4853 18.0711Z" fill="rgba(255,255,255,1)"></path></svg>
+           </button>
          </form>
          <div>
           <ul class="navbar-nav me-auto mb-2mb-lg-0">
            <li class="nav-item dropdown mx-2">
             {% if request.user.is_authenticated %}
               <a class="nav-link dropdown-toggle text-white" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Account({{user}})
-              </a>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="36" height="36"><path d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2ZM12.1597 16C10.1243 16 8.29182 16.8687 7.01276 18.2556C8.38039 19.3474 10.114 20 12 20C13.9695 20 15.7727 19.2883 17.1666 18.1081C15.8956 16.8074 14.1219 16 12.1597 16ZM12 4C7.58172 4 4 7.58172 4 12C4 13.8106 4.6015 15.4807 5.61557 16.8214C7.25639 15.0841 9.58144 14 12.1597 14C14.6441 14 16.8933 15.0066 18.5218 16.6342C19.4526 15.3267 20 13.7273 20 12C20 7.58172 16.4183 4 12 4ZM12 5C14.2091 5 16 6.79086 16 9C16 11.2091 14.2091 13 12 13C9.79086 13 8 11.2091 8 9C8 6.79086 9.79086 5 12 5ZM12 7C10.8954 7 10 7.89543 10 9C10 10.1046 10.8954 11 12 11C13.1046 11 14 10.1046 14 9C14 7.89543 13.1046 7 12 7Z" fill="rgba(14,222,42,1)"></path></svg>
+              {{request.user}}</a>
               <ul class="dropdown-menu" aria-labelledby="profileDropdown">
                 <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
                 <li><a class="dropdown-item" href="{% url 'orders' %}">Orders</a></li>
@@ -71,7 +73,8 @@
               </ul>
             </li>
             <li class="nav-item mx-2" id="image">
-             <a href="{% url 'cart' %}" class="nav-link text-white"><span class="badge bg-danger">{{nocart}}</span> Cart </a>
+             <a href="{% url 'cart' %}" class="nav-link ">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="36" height="36"><path d="M4.00488 16V4H2.00488V2H5.00488C5.55717 2 6.00488 2.44772 6.00488 3V15H18.4433L20.4433 7H8.00488V5H21.7241C22.2764 5 22.7241 5.44772 22.7241 6C22.7241 6.08176 22.7141 6.16322 22.6942 6.24254L20.1942 16.2425C20.083 16.6877 19.683 17 19.2241 17H5.00488C4.4526 17 4.00488 16.5523 4.00488 16ZM6.00488 23C4.90031 23 4.00488 22.1046 4.00488 21C4.00488 19.8954 4.90031 19 6.00488 19C7.10945 19 8.00488 19.8954 8.00488 21C8.00488 22.1046 7.10945 23 6.00488 23ZM18.0049 23C16.9003 23 16.0049 22.1046 16.0049 21C16.0049 19.8954 16.9003 19 18.0049 19C19.1095 19 20.0049 19.8954 20.0049 21C20.0049 22.1046 19.1095 23 18.0049 23Z" fill="rgba(29,220,29,1)"></path></svg><span class="badge bg-danger">{{nocart}}</span></a>
              {% else %}
             </li>
             <li class="nav-item mx-2" id="image">
@@ -91,10 +94,25 @@
     {% block main-content %} {% endblock main-content %}
 
 
-    <footer class="container-fluid bg-dark text-center p-2 mt-5">
+    <footer class="container-fluid bg-dark text-center p-2 mb-1 ">
         <small class="text-white">Copyright &copy; 2023 || Designed By Incognito || </small>
         <img src="{% static 'app/images/payment.png' %}" alt="" srcset="" class="img-fluid" height="2px">
     </footer>  
+    <style>
+      html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 100px; /* height of the footer */
+}
+    footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 60px; /* change this value to adjust the height of the footer */
+    }</style>
 
     <!-- Jquery -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>

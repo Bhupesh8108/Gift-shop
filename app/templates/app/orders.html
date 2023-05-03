@@ -10,12 +10,33 @@
     <li class="d-grid"><a href="{% url 'orders' %}" class="btn btn-primary">Orders</a></li>
    </ul>
   </div>
-  <div class="col-sm-9 offset-sm-1">
-   <div class="row">
-    <div class="col-sm-6">Order 1</div>
-    <div class="col-sm-6">Order 2</div>
+  
+  {% if cart_items %}
+  {% for item in cart_items %}
+  <div class="row">
+   <div class="col-sm-3 text-center align-self-center"><img src="/media/{{item.product.image}}" alt="" srcset="" class="img-fluid img-thumbnail shadow-sm" height="150" width="150"> </div>
+   <div class="col-sm-9">
+    
+    <div>
+      <a href="/product-detail/{{item.product.id}}" class="text-decoration-none"><h5>{{item.product.name}}</h5></a>
+     <div class="my-3">
+      <label for="quantity">Quantity:{{item.quantity}}</label>
+     </div> 
+     <div class="d-flex justify-content-between">
+      <p class="mb-0"><span><strong>Price : Rs. {{item.product.price}}</strong></span></p>
+     </div>
+    </div>
    </div>
-  </div>
+  </div> <hr>{% endfor %}
+  {% else %}
+  <div class="card">
+    <div class="card-body">
+  <h5> No order found</h5>
+  <a href="/cart" class="btn btn-warning">Go to cart</a>
+  </div></div>
+  {% endif %}
+
+
  </div>
 </div>
 {% endblock main-content %}

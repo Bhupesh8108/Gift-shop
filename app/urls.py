@@ -19,6 +19,7 @@ urlpatterns = [
     path('minuscart/',views.minuscart,name='minuscart'),
     path('pluscart/',views.pluscart,name='pluscart'),
     path('removecart/',views.removecart,name='removecart'),
+    path('searchresult/', views.searchresult, name='searchresult'),
     # path('registration/', views.customerregistration, name='customerregistration'),
     path('registration',views.customerregistration.as_view(), name='customerregistration'),
     path('checkout/', views.checkout, name='checkout'),
