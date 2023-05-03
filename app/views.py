@@ -1,5 +1,5 @@
 from django.shortcuts import render,get_object_or_404,HttpResponse,redirect
-from .models import item,categories,wishlist
+from .models import item,categories,wishlist,order
 from django.views import View
 from .forms import CustomerRegistrationForm,authentication,password_change,customerprofileform,customer
 from django.contrib import messages
@@ -234,5 +234,12 @@ class customerregistration(View):
 def checkout(request):
  price,cart_items = update_price(request)
  shipping_addresses = customer.objects.filter(user=request.user)
+ if shipping_addresses:
+  for item in cart_items:
+    orders = order(price=item.product.price,product=item.product,user=request.user,address=shipping_addresses[0])
+    orders.save()
+  messages.success(request,'order created successfully')
+ else:
+  messages.warning(request,'No shipping addresses found')
 
- return render(request, 'app/checkout.html',{'cart_items': cart_items, 'shipping_addresses': shipping_addresses,'price': price+50})
+ return render(request, 'app/checkout.html',{'cart_items': cart_items, 'shipping_addresses': shipping_addresses,'price': price,'total':price+50})

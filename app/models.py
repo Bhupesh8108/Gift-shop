@@ -45,3 +45,14 @@ class customer(models.Model):
     phone_number = models.IntegerField()
     def __str__ (self):
       return f'{self.name} {self.user}  {self.country}'
+    
+
+class order(models.Model):
+    date = models.DateTimeField(auto_now_add=True)
+    price = models.IntegerField()
+    address = models.ForeignKey(customer,on_delete=models.CASCADE)
+    product = models.ForeignKey(item, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    # country = models.ForeignKey(customer, on_delete=models.CASCADE)
+    def __str__(self):
+        return f'{self.product} by {self.user}'
