@@ -1,13 +1,13 @@
 from django.shortcuts import render,get_object_or_404,HttpResponse,redirect
 from .models import item,categories,wishlist
 from django.views import View
-from .forms import CustomerRegistrationForm,authentication,password_change
+from .forms import CustomerRegistrationForm,authentication,password_change,customerprofileform,customer
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.contrib.auth.views import LoginView,PasswordChangeView
-from ipware import get_client_ip 
-from ip2geotools.databases.noncommercial import DbIpCity
+from ipware import get_client_ip
+from ip2geotools.databases.noncommercial import DbIpCity 
 
 
 
@@ -26,16 +26,6 @@ def product_detail(request,id):
  prod = item.objects.filter(id=id).first()
  products = item.objects.all()
  user = request.user
- ip,routable = get_client_ip(request)
- print(ip)
- if ip is None:
-  ip = '0.0.0.0'
-
- try:
-  response = DbIpCity.get(ip,api_key="free")
- except:
-  response = None
- print(response)
  try:
   product_id = request.GET.get('product_id')
   product = item.objects.get(id = product_id)
@@ -151,16 +141,42 @@ def buy_now(request):
 
 
 
+class profile(View):
+ def get(self, request):
+  form = customerprofileform()
+  return render(request, 'app/profile.html',{'form':form})
+ def post(self, request):
+  form = customerprofileform(request.POST)
+  if form.is_valid():
+    name = form.cleaned_data['name']
+    main_address = form.cleaned_data['main_address']
+    street_address = form.cleaned_data['street_address']
+    additional_address = form.cleaned_data['additional_address']
+    phone_number = form.cleaned_data['phone_number']
+    ip,routable = get_client_ip(request)
+    country = "unknown"
+    if ip:
+     country = DbIpCity.get(ip,api_key="free").country
+    profile = customer(name= name, main_address =main_address, street_address=street_address,additional_address=additional_address,phone_number=phone_number,country=country)
+    profile.user = request.user
+    profile.save()
+    messages.success(request,"Address added successfully")
+  return render(request, 'app/profile.html',{'form':form})
 
-def profile(request):
- return render(request, 'app/profile.html')
+
+
+
+    
+
+ 
 
 
 
 
 
 def address(request):
- return render(request, 'app/address.html')
+ addresses = customer.objects.filter(user=request.user)
+ return render(request, 'app/address.html',{"addresses" : addresses})
 
 
 
@@ -216,4 +232,7 @@ class customerregistration(View):
 
 
 def checkout(request):
- return render(request, 'app/checkout.html')
+ price,cart_items = update_price(request)
+ shipping_addresses = customer.objects.filter(user=request.user)
+
+ return render(request, 'app/checkout.html',{'cart_items': cart_items, 'shipping_addresses': shipping_addresses,'price': price+50})

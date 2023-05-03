@@ -7,8 +7,8 @@
  <h3>Welcome {{request.user}}</h3>
   <div class="col-sm-2 border-end">
    <ul class="list-unstyled">
-    <li class="d-grid"><a href="{% url 'profile' %}" class="btn btn-primary">Profile</a></li>
-    <li class="d-grid"><a href="{% url 'address' %}" class="btn">Address</a></li>
+    <li class="d-grid"><a href="{% url 'profile' %}" class="btn">Profile</a></li>
+    <li class="d-grid"><a href="{% url 'address' %}" class="btn btn-primary">Address</a></li>
    </ul>
   </div>
   <div class="col-sm-9 offset-sm-1">
@@ -16,14 +16,18 @@
     <div class="col-sm-6">
      <div class="card">
       <div class="card-body">
-       <h3>Address 1</h3>
-       <p>Name: {{request.user.username}}</p>
-       <p>Address 1: Bharatpur</p>
-       <p>Address 2: Lionschowk</p>
-       <p>Street: Balkumari road</p>
+        {% for address in addresses %}
+       <h3>{{address.name}}'s Address</h3>
+
+       <p>Address 1: {{address.main_address}}</p>
+       <p>Address 2: {{address.street_address}}</p>
+       <p>Street: {{address.additional_address}}</p>
       </div>
      </div>
-    </div>
+     <br>
+     {% endfor %}
+   </div>
+     <!--
     <div class="col-sm-6">
      <div class="card">
       <div class="card-body">
@@ -34,7 +38,7 @@
        <p>Street: Hospital road</p>
       </div>
      </div>
-    </div>
+    </div> -->
    </div>
   </div>
  </div>

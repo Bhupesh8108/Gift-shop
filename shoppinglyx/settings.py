@@ -27,7 +27,7 @@ SECRET_KEY = '8o353)z(_*^04+jhey!m*q3_no@vhn*7v8(6xz4rl6=kunu=it'
 DEBUG = True
 
 ALLOWED_HOSTS = ['giftwan.pythonanywhere.com']
-# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = []
 
 
 

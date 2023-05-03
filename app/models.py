@@ -30,6 +30,18 @@ class wishlist(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     product = models.ForeignKey(item, on_delete=models.CASCADE)
     quantity = models.IntegerField(default = 1)
-    ip = models.CharField(max_length=500,default="0.0.0.0")
     def __str__(self):
         return f'{self.product} by {self.user}'
+    
+
+
+class customer(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)
+    main_address = models.CharField(max_length=200)
+    street_address= models.CharField(max_length=200)
+    additional_address = models.CharField(max_length=200)
+    country = models.CharField(max_length=20 , default='unknown')
+    phone_number = models.IntegerField()
+    def __str__ (self):
+      return f'{self.name} {self.user}  {self.country}'
