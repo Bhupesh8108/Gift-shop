@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from django.contrib.auth.views import LoginView, PasswordChangeView
 from ipware import get_client_ip
 from ip2geotools.databases.noncommercial import DbIpCity
+from datetime import datetime,timedelta
 
 
 def home(request):
