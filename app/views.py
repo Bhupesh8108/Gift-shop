@@ -13,6 +13,7 @@ from django.urls import reverse
 import uuid
 from .logic import send_reset_link
 from django.core.mail import send_mail
+import datetime as dt
 
 
 def home(request):
@@ -270,13 +271,11 @@ class reset_password(View):
             user_email = user_detail[0].email
             messages.success(request,f"Password reset link sent to:{user_email}")
             token = uuid.uuid4()
-            forgot_password_user = forget_password.objects.get(user=user_detail[0])
-            if forgot_password_user:
+            try :
+                forgot_password_user = forget_password.objects.get(user=user_detail[0])
                 forgot_password_user.forgot_password_token=token
                 forgot_password_user.save()
-
-
-            else:
+            except:
                 forget_password(user=user_detail[0],forgot_password_token=token).save()
             send_reset_link(token,user_email)
             return redirect(reverse('password_reset'))
@@ -298,8 +297,9 @@ class password_set_view(View):
     def post(self, request,token):
         new_password =  request.POST.get('new_password1')
         confirm_password = request.POST.get('new_password2')
+        valid_time = dt.datetime.today() - dt.timedelta(minutes=5)
         try:
-            user_name = forget_password.objects.filter(Q(forgot_password_token=token))
+            user_name = forget_password.objects.filter(Q(forgot_password_token=token,created_at__gte=valid_time))
             user_query = User.objects.get(username=user_name[0])
             if new_password != confirm_password:
                 messages.warning(request,'Two password didnot match')
@@ -315,6 +315,7 @@ class password_set_view(View):
                 user_query.set_password(new_password)
                 user_query.save()
                 messages.success(request,'Password reset successfully')
+                user_name.delete()
                 return redirect('login')
         except:
             messages.error(request,'This link has been expired, Please try again')
