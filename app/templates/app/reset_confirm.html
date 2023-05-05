@@ -5,27 +5,22 @@
 <div class="container">
  <div class="row my-3">
   <div class="col-sm-6 offset-sm-3">
-   <h3>Login</h3>
+   <h3>Set new Password</h3>
    <hr>
    <form action="" method="post" novalidate class="shadow p-5">
     {% csrf_token %}
-    {% if form.errors %}
-    {% for field,errors in form.errors.items %}
-    {% for error in errors %}
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">{{error}}
+{% for message in messages %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">{{message}}
        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
      </div>
-   {% endfor %}
-   {% endfor %}
-   {% endif %}
+     {% endfor %}
      {% for fm in form %}
      <div class="form-group ">
         {{fm.label_tag}}{{fm}} <small class="text-danger"> {{fm.errors| striptags}}</small> <br>
      </div>
      {% endfor %}
-     <small><a href="{% url 'password_reset'%}"> Forgot password</a></small><br>
    
-     <input type="submit" class = "btn btn-primary mt-4" value="Login" ><br><br><br>
+     <input type="submit" class = "btn btn-primary mt-4" value="Set Password" ><br><br><br>
 
   
       

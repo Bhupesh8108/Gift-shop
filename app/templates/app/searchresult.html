@@ -12,7 +12,6 @@
    <a href="/product-detail/{{product.id}}" class = "text-decoration-none">
      <div class="item"><img src="/media/{{ product.image }}" alt="" ><br><span class="fw-bold">{{product.name}}</span><br><p>{{product.price}} {% if product.offer_price > 0 %}<small class="fw-light text-decoration-line-through">{{product.offer_price}}</small>{% endif %}</p> <br></div></a>
     
-   
      {% endfor %}
      {% else %}
      <h2>No prouct found {{searchtext}}</h2>

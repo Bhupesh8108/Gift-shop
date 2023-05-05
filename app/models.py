@@ -10,6 +10,14 @@ categories = [
     ('Chocolate','clt'),
     ('Jewels','jwl')
 ]
+options = {
+    ('Pending','pending'),
+    ('Accepted','accepted'),
+    ('Delivered','delivered'),
+
+
+
+}
 def upload_path(instance, filename):
     base_filename, file_extension = os.path.splitext(filename)
     return 'app/images/product/{}{}'.format(base_filename, file_extension)
@@ -36,6 +44,7 @@ class wishlist(models.Model):
     
 
 
+
 class customer(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
@@ -45,7 +54,7 @@ class customer(models.Model):
     country = models.CharField(max_length=20 , default='unknown')
     phone_number = models.IntegerField(validators=[MaxValueValidator(9999999999),MinValueValidator(9000000000)])
     def __str__ (self):
-      return f'{self.name} {self.user}  {self.country}'
+        return f'{self.name} {self.user}  {self.country}'
     
 
 class order(models.Model):
@@ -55,6 +64,7 @@ class order(models.Model):
     product = models.ForeignKey(item, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
+    status = models.CharField(max_length=10,choices=options,default='pending')
     # country = models.ForeignKey(customer, on_delete=models.CASCADE)
     def __str__(self):
         return f'{self.product} by {self.user}Rs.{self.price}'
@@ -63,4 +73,14 @@ class order(models.Model):
 class search(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     searchtext = models.TextField()
+    ip = models.TextField(default="0.0.0.0")
     datetime = models.DateTimeField(auto_now=True)
+    def __str__(self):
+        return f'{self.searchtext} by {self.user}'
+    
+class forget_password(models.Model):
+        user = models.OneToOneField(User,on_delete=models.CASCADE)
+        forgot_password_token = models.CharField(max_length=100)
+        created_at = models.DateTimeField(auto_now = True)
+        def __str__(self):
+            return str(self.user)

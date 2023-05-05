@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm,AuthenticationForm,UsernameField,PasswordChangeForm
+from django.contrib.auth.forms import UserCreationForm,AuthenticationForm,UsernameField,PasswordChangeForm,PasswordResetForm,SetPasswordForm
 from django.contrib.auth.models import User
 from django.contrib.auth import password_validation
 from .models import customer
@@ -37,7 +37,16 @@ class customerprofileform(forms.ModelForm):
         widgets = {'name':forms.TextInput(attrs={'class':'form-control','placeholder':'Home Office GF Home.....'}),
                    'main_address':forms.TextInput(attrs={'class':'form-control','placeholder':'Bharatpur-2-LionsChowk'}),
                    'street_address':forms.TextInput(attrs={'class':'form-control','placeholder':'Balkumari road'}),
-                   'additional_address':forms.TextInput(attrs={'class':'form-control','placeholder':'Nearby shops,hospitals,schools or other(optional)'}),
-                   'phone_number':forms.TextInput(attrs={'class':'form-control'})}
+                   'additional_address':forms.TextInput(attrs={'class':'form-control','placeholder':'Nearby shops,hospitals,schools or other'}),
+                   'phone_number':forms.TextInput(attrs={'class':'form-control','placeholder':'9846xxxxxx'})}
 
+
+
+class password_reset_form(PasswordResetForm):
+    email= forms.EmailField(required=True, widget = forms.EmailInput(attrs={'class': 'form-control','autocomplete':'email'}))
+
+   
+class password_set(SetPasswordForm):
+    new_password1 = forms.CharField(label= "New Password",strip=False,widget=forms.PasswordInput(attrs={'autocomplete': 'new-password','autofocus': 'Ture',"class":'form-control'}))
+    new_password2  = forms.CharField(label= "Confirm New Password",strip=False,widget=forms.PasswordInput(attrs={'autocomplete': 'new-password','autofocus': 'Ture',"class":'form-control'}))
 
