@@ -7,7 +7,7 @@ from .forms import password_set,password_reset_form
 
 urlpatterns = [
     path('', views.home,name='home'),
-    path('product-detail/<str:id>', views.product_detail, name='product-detail'),
+    path('product-detail/<str:id>', views.product_detail.as_view(), name='product-detail'),
     path('cart/', views.cart, name='cart'),
     path('buy/', views.buy_now, name='buy-now'),
     path('profile/', views.profile.as_view(), name='profile'),
@@ -20,7 +20,7 @@ urlpatterns = [
     path('minuscart/',views.minuscart,name='minuscart'),
     path('pluscart/',views.pluscart,name='pluscart'),
     path('removecart/',views.removecart,name='removecart'),
-    path('searchresult/', views.searchresult, name='searchresult'),
+    path('searchresult/', views.searchresult.as_view(), name='searchresult'),
     path('resetpassword/',views.reset_password.as_view(),name='password_reset'),
     path('password-set/<token>',views.password_set_view.as_view(),name='password_set'),
     # path('resetpassword/',views.reset_password.as_view(),name='password_reset'),

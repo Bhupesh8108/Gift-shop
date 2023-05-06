@@ -4,17 +4,17 @@ $('#slider1, #slider2, #slider3').owlCarousel({
     responsiveClass: true,
     responsive: {
         0: {
-            items: 3,
+            items: 4,
             nav: false,
             autoplay: true,
         },
         600: {
-            items: 5,
+            items: 6,
             nav: true,
             autoplay: true,
         },
         1000: {
-            items: 7,
+            items: 9,
             nav: true,
             loop: true,
             autoplay: true,

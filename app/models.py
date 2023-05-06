@@ -11,9 +11,9 @@ categories = [
     ('Jewels','jwl')
 ]
 options = {
-    ('Pending','pending'),
-    ('Accepted','accepted'),
-    ('Delivered','delivered'),
+    ('Pending','Pending'),
+    ('Accepted','Accepted'),
+    ('Delivered','Delivered'),
 
 
 

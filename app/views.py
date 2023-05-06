@@ -11,32 +11,36 @@ from ip2geotools.databases.noncommercial import DbIpCity
 from django.db.models import Q
 from django.urls import reverse
 import uuid
-from .logic import send_reset_link
-from django.core.mail import send_mail
+from django.db.models.functions import Random
+from .logic import send_reset_link,send_order_mail
 import datetime as dt
 
 
 def home(request):
-    products = item.objects.all()
+    products = item.objects.all().order_by(Random())
     return render(request, 'app/home.html', {"products": products, "categories": categories})
 
 
-def product_detail(request, id):
-    prod = item.objects.filter(id=id).first()
-    products = item.objects.all()
-    user = request.user
-    try:
-        product_id = request.GET.get('product_id')
-        product = item.objects.get(id=product_id)
+class product_detail(View):
+    def get(self,request,id):
+        prod = item.objects.filter(id=id).first()
+        products = item.objects.all().order_by(Random())
+        product = item.objects.get(id=id)
         if wishlist.objects.filter(product=product, user=request.user).exists():
-            messages.warning(request, "Product is already in cart")
+            btn_text = "Remove from cart"
         else:
-            wishlist(user=user, product=product, quantity=1).save()
-            messages.success(request, 'Product added to cart')
-    except:
-        pass
-    return render(request, 'app/productdetail.html', {'prod': prod, "products": products})
+            btn_text = "Add to cart"
+        return render(request, 'app/productdetail.html', {'prod': prod, "products": products,'btn_text': btn_text})
 
+    def post(self,request,id):
+        product = item.objects.get(id=id)
+        if wishlist.objects.filter(product=product, user=request.user).exists():
+            wishlist.objects.filter(user=request.user, product=product).delete()
+            messages.warning(request, 'Product removed from cart')
+        else:
+            wishlist(user=request.user, product=product, quantity=1).save()
+            messages.success(request, 'Product added to cart')
+        return redirect(f'/product-detail/{id}')        
 
 def login(request):
     pid = request.GET.get('product_id')
@@ -150,12 +154,6 @@ class profile(View):
 
     
 
- 
-
-
-
-
-
 def address(request):
     addresses = customer.objects.filter(user=request.user)
     try:
@@ -168,16 +166,9 @@ def address(request):
 
 
 
-
-
 def orders(request):
     cart_items = order.objects.filter(user=request.user)
     return render(request, 'app/orders.html',{"cart_items" : cart_items})
-
-
-
-
-
 
 
 
@@ -186,12 +177,8 @@ def change_password(request):
  
 
 
-
-
 def mobile(request):
     return render(request, 'app/mobile.html')
-
-
 
 
 
@@ -215,6 +202,7 @@ class customerregistration(View):
                         user.email = email
                         user.save()
                         messages.success(request,'User registered successfully')
+                        return redirect(reverse('login'))
         return render(request, 'app/customerregistration.html', {'form': form})
 
 
@@ -237,8 +225,8 @@ def checkout(request):
                     quantity= item.quantity
                     orders = order(price=item.product.price*item.quantity,product=item.product,user=request.user,address=actual_shipping_address,quantity=quantity)
                     orders.save()
-                    # address = f'{actual_shipping_address.main_address} {actual_shipping_address.street_address} near {actual_shipping_address.additional_address}'
-                    # send_email(request,product=item.product,user=request.user,email=request.user.email,address=address,quantity=item.quantity,phone_number=actual_shipping_address.phone_number)
+                address = f'{actual_shipping_address.main_address} {actual_shipping_address.street_address} near {actual_shipping_address.additional_address}'
+                # send_order_mail(request.user.email,item.product,quantity,address,actual_shipping_address.phone_number,request.user)
             wishlist.objects.filter(user=request.user).delete()
             messages.success(request,'order created successfully')
 
@@ -250,18 +238,29 @@ def checkout(request):
 
 
 
-def searchresult(request):
-    search_text = request.GET.get('search')
-    if request.user.is_authenticated:
-        username = request.user
-    else:
-        username = get_object_or_404(user='anonymous')
-    ip = get_client_ip(request)[0]
-    search(searchtext=search_text,user=username,ip=ip).save()
-    search_items = item.objects.filter(name__contains =search_text)
+class searchresult(View):
+    def get(self, request):
+        search_text = request.GET.get('search')
+        if request.user.is_authenticated:
+            username = request.user
+        else:
+            username = get_object_or_404(user='anonymous')
+        ip = get_client_ip(request)[0]
+        search(searchtext=search_text,user=username,ip=ip).save()
+        search_items = item.objects.filter(Q(name__contains =search_text) | Q(description__contains=search_text))
+        request.session['search_items'] = list(search_items.values())
+        request.session['search_text'] = search_text
 
-    return render(request, 'app/searchresult.html',{'searchtext': search_text,'search_items':search_items})
-   
+        return render(request, 'app/searchresult.html',{'search_text': search_text,'search_items':search_items})
+    def post(self, request):
+        slider_value = request.POST.get('price_range')
+        id_list = []
+        search_text = request.session.get('search_text')
+        for id in request.session.get('search_items',[]):
+            id_list.append(id['id'])
+        search_items = item.objects.filter(id__in=id_list,price__lte = slider_value)
+        return render(request, 'app/searchresult.html',{'search_items':search_items,'price_range':slider_value,'searc_htext': search_text})
+        
 
 class reset_password(View):
     def post(self,request):
@@ -269,7 +268,6 @@ class reset_password(View):
         user_detail = User.objects.filter(Q(username=email)| Q(email=email))
         if user_detail.exists():
             user_email = user_detail[0].email
-            messages.success(request,f"Password reset link sent to:{user_email}")
             token = uuid.uuid4()
             try :
                 forgot_password_user = forget_password.objects.get(user=user_detail[0])
@@ -278,6 +276,7 @@ class reset_password(View):
             except:
                 forget_password(user=user_detail[0],forgot_password_token=token).save()
             send_reset_link(token,user_email)
+            messages.success(request,f"Password reset link sent to:{user_email}")
             return redirect(reverse('password_reset'))
         else:
             messages.warning(request,"No user found with given email")
@@ -320,8 +319,4 @@ class password_set_view(View):
         except:
             messages.error(request,'This link has been expired, Please try again')
             return render(request, 'app/reset_confirm.html')
-
-        
-        
-        
-        
+         

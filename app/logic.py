@@ -8,3 +8,18 @@ def send_reset_link(token,email):
     recipient = [email]
     send_mail(subject,message,sender,recipient)
     return True
+
+def send_order_mail(email,product,quantity,address,number,user):
+    subject = "Order recieved"
+    message =f'''
+    Dear {user}, 
+    We have received the order from you 
+    email : {email},
+    product:{product},
+    quantity:{quantity},
+    address:{address},
+    number:{number},
+    '''
+    sender = 'info.giftwan@gmail.com'
+    recipient = [email,'bhupeshdawadi12345@gmail.com']
+    send_mail(subject,message,sender,recipient)

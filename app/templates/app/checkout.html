@@ -15,27 +15,19 @@
  <div class="row mt-5">
   <div class="col-sm-6">
     <h4>Order Summary</h4>
-
-
-
-
-
-
-
-
       {% if cart_items %}
     {% for item in cart_items %}
     <div class="row">
      <div class="col-sm-3 text-center align-self-center"><img src="/media/{{item.product.image}}" alt="" srcset="" class="img-fluid img-thumbnail shadow-sm" height="150" width="150"> </div>
      <div class="col-sm-9">
       
-      <div>
+      <div class = "col">
         <h5>{{item.product.name}}</h5>
        <div class="my-3">
         <label for="quantity">Quantity:{{item.quantity}}</label>
        </div> 
 
-         </div></div></div></div>
+         </div></div>
 {% endfor %}
 <!-- <div class="card">
   <div class="card-body">
