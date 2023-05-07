@@ -24,11 +24,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = '8o353)z(_*^04+jhey!m*q3_no@vhn*7v8(6xz4rl6=kunu=it'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 
 ALLOWED_HOSTS = ['giftwan.pythonanywhere.com']
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
 
 
 
@@ -134,5 +134,5 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'info.giftwan@gmail.com'
-EMAIL_HOST_PASSWORD = 'fokaauhqkeakxngp'
+EMAIL_HOST_USER = 'noreply.giftwan@gmail.com'
+EMAIL_HOST_PASSWORD = 'ghnbxeqjejegjsmi'

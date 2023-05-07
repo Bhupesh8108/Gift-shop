@@ -20,6 +20,6 @@ def send_order_mail(email,product,quantity,address,number,user):
     address:{address},
     number:{number},
     '''
-    sender = 'info.giftwan@gmail.com'
+    sender = 'noreply.giftwan@gmail.com'
     recipient = [email,'bhupeshdawadi12345@gmail.com']
     send_mail(subject,message,sender,recipient)
