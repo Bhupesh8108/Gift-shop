@@ -23,6 +23,7 @@ urlpatterns = [
     path('searchresult/', views.searchresult.as_view(), name='searchresult'),
     path('resetpassword/',views.reset_password.as_view(),name='password_reset'),
     path('password-set/<token>',views.password_set_view.as_view(),name='password_set'),
+    path('test/',views.test.as_view(),name='test'),
     # path('resetpassword/',views.reset_password.as_view(),name='password_reset'),
 
     # path('resetpassword/done/',auth_views.PasswordResetDoneView.as_view(

@@ -246,7 +246,7 @@ class searchresult(View):
         if request.user.is_authenticated:
             username = request.user
         else:
-            username = get_object_or_404(user='anonymous')
+            username = get_object_or_404(User, username='anonymous')
         ip = get_client_ip(request)[0]
         search(searchtext=search_text,user=username,ip=ip).save()
         search_items = item.objects.filter(Q(name__contains =search_text) | Q(description__contains=search_text))
@@ -322,3 +322,8 @@ class password_set_view(View):
             messages.error(request,'This link has been expired, Please try again')
             return render(request, 'app/reset_confirm.html')
          
+
+class test(View):
+    def get(self,request):
+        products = item.objects.all().order_by(Random())
+        return render(request,'app/test.html',dict(products=products))
