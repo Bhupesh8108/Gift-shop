@@ -14,7 +14,7 @@ urlpatterns = [
     path('address/', views.address, name='address'),
     path('orders/', views.orders, name='orders'),
     path('changepassword/', views.change_password , name='changepassword'),
-    path('mobile/', views.mobile, name='mobile'),
+    path('category/<category>', views.category, name='category'),
     path('login/', views.login, name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
     path('minuscart/',views.minuscart,name='minuscart'),

@@ -28,7 +28,7 @@ DEBUG = True
 
 
 ALLOWED_HOSTS = ['giftwan.pythonanywhere.com']
-# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = []
 
 
 

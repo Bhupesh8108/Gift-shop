@@ -26,7 +26,7 @@ class product_detail(View):
         prod = item.objects.filter(id=id).first()
         products = item.objects.all().order_by(Random())
         product = item.objects.get(id=id)
-        if wishlist.objects.filter(product=product, user=request.user).exists():
+        if request.user.is_authenticated and wishlist.objects.filter(product=product, user=request.user).exists():
             btn_text = "Remove from cart"
         else:
             btn_text = "Add to cart"
@@ -177,8 +177,10 @@ def change_password(request):
  
 
 
-def mobile(request):
-    return render(request, 'app/mobile.html')
+def category(request,category):
+    print(category)
+    products = item.objects.filter(category=category).order_by(Random())
+    return render(request, 'app/category.html',dict(products=products,category= category))
 
 
 
@@ -251,7 +253,7 @@ class searchresult(View):
         request.session['search_items'] = list(search_items.values())
         request.session['search_text'] = search_text
 
-        return render(request, 'app/searchresult.html',{'search_text': search_text,'search_items':search_items})
+        return render(request, 'app/searchresult.html',{'search_text': search_text,'search_items':search_items,'x':len(search_items)})
     def post(self, request):
         slider_value = request.POST.get('price_range')
         id_list = []
@@ -259,7 +261,7 @@ class searchresult(View):
         for id in request.session.get('search_items',[]):
             id_list.append(id['id'])
         search_items = item.objects.filter(id__in=id_list,price__lte = slider_value)
-        return render(request, 'app/searchresult.html',{'search_items':search_items,'price_range':slider_value,'searc_htext': search_text})
+        return render(request, 'app/searchresult.html',{'search_items':search_items,'price_range':slider_value,'search_text': search_text,'x':len(search_items)})
         
 
 class reset_password(View):
