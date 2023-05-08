@@ -15,6 +15,8 @@
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
       {% endfor %}
+   <p class="text-danger">Note: username mustnot contain whitespace</p>
+
       {% for fm in form %}
       <div class="form-group mb-3">
          {{fm.label_tag}}{{fm}} <small class="text-danger"> {{fm.errors| striptags}}</small>

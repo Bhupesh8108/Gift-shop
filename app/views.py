@@ -23,6 +23,7 @@ def home(request):
 
 class product_detail(View):
     def get(self,request,id):
+        print(id)
         prod = item.objects.filter(id=id).first()
         products = item.objects.all().order_by(Random())
         product = item.objects.get(id=id)
@@ -33,6 +34,7 @@ class product_detail(View):
         return render(request, 'app/productdetail.html', {'prod': prod, "products": products,'btn_text': btn_text})
 
     def post(self,request,id):
+        print(id)
         product = item.objects.get(id=id)
         if wishlist.objects.filter(product=product, user=request.user).exists():
             wishlist.objects.filter(user=request.user, product=product).delete()
