@@ -4,17 +4,17 @@ $('#slider1, #slider2, #slider3').owlCarousel({
     responsiveClass: true,
     responsive: {
         0: {
-            items: 3,
+            items: 4,
             nav: false,
             autoplay: true,
         },
         600: {
-            items: 5,
+            items: 6,
             nav: true,
             autoplay: true,
         },
         1000: {
-            items: 7,
+            items: 9,
             nav: true,
             loop: true,
             autoplay: true,
@@ -59,4 +59,25 @@ $('.minus-cart').click(function() {
     document.getElementById("total").innerText = data.total;}
     })
 })
+
+
+$('.remove-cart').click(function() {
+    var id = $(this).attr("value").toString();
+    console.log(id);
+    var eml = this.parentNode.children[2]
+
+    $.ajax({
+        type:"GET",
+        url:"/minuscart",
+        data:{
+            "produc_id":id 
+        },
+        success: function(data) {
+            console.log(data);
+            eml.innerText = data.quantity;
+        document.getElementById("amount").innerText = data.price;
+    document.getElementById("total").innerText = data.total;}
+    })
+})
+
 
