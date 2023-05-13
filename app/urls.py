@@ -9,7 +9,7 @@ urlpatterns = [
     path('', views.home,name='home'),
     path('product-detail/<str:id>', views.product_detail.as_view(), name='product-detail'),
     path('cart/', views.cart, name='cart'),
-    path('buy/', views.buy_now, name='buy-now'),
+    path('buy/<str:id>', views.buy_now.as_view(), name='buy-now'),
     path('profile/', views.profile.as_view(), name='profile'),
     path('address/', views.address, name='address'),
     path('orders/', views.orders, name='orders'),
@@ -23,9 +23,9 @@ urlpatterns = [
     path('searchresult/', views.searchresult.as_view(), name='searchresult'),
     path('resetpassword/',views.reset_password.as_view(),name='password_reset'),
     path('password-set/<token>',views.password_set_view.as_view(),name='password_set'),
-    path('test/',views.test.as_view(),name='test'),
+    path('verifypayment',views.verifypayment.as_view(),name='verifypayment'),
+    path('verifycartpayment',views.verifycartpayment.as_view(),name='verifycartpayment'),
     # path('resetpassword/',views.reset_password.as_view(),name='password_reset'),
-
     # path('resetpassword/done/',auth_views.PasswordResetDoneView.as_view(
     # template_name = 'app/reset_done.html'), name='password_reset_done'),
     # path('resetpassword/confirm/<uidb64>/<token>/',auth_views.PasswordResetConfirmView.as_view(
@@ -34,5 +34,6 @@ urlpatterns = [
     # path('resetpassword/complete/',auth_views.PasswordResetCompleteView.as_view(
     # template_name = 'app/reset_complete.html'), name='password_reset_complete'),
     path('registration',views.customerregistration.as_view(), name='customerregistration'),
+    path('my_product',views.my_product.as_view(), name='my_product'),
     path('checkout/', views.checkout, name='checkout'),
 ] + static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

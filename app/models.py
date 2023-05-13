@@ -1,7 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User 
 from django.core.validators import MaxValueValidator,MinValueValidator
-import os
+import os,datetime
+from django.utils import timezone
 categories = [
     ('Birthday', 'hbd'),
     ('Electronic','elt'),
@@ -23,6 +24,7 @@ def upload_path(instance, filename):
     return 'app/images/product/{}{}'.format(base_filename, file_extension)
 
 class item(models.Model):
+    date = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=56,default = None)
     description = models.CharField(max_length=500,default = " Good quality product")
     image = models.ImageField(upload_to=upload_path)
@@ -30,6 +32,8 @@ class item(models.Model):
     offer_price = models.IntegerField(default=0)
     category = models.CharField(choices=categories,max_length=20)
     id = models.AutoField(primary_key=True)
+    seller = models.ForeignKey(User, on_delete=models.CASCADE ,default="26")
+
     def __str__(self):
         return str(f'{self.name}({self.id})')
     
@@ -64,8 +68,7 @@ class order(models.Model):
     product = models.ForeignKey(item, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
-    status = models.CharField(max_length=10,choices=options,default='pending')
-    # country = models.ForeignKey(customer, on_delete=models.CASCADE)
+    status = models.CharField(max_length=10,choices=options,default='Pending')
     def __str__(self):
         return f'{self.product} by {self.user}Rs.{self.price}'
 

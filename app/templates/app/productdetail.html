@@ -4,6 +4,8 @@
 <link rel="stylesheet" href="{% static '/app/css/home.css'%}">
 
 {% block main-content %}
+<script src="https://khalti.s3.ap-south-1.amazonaws.com/KPG/dist/2020.12.17.0.0.0/khalti-checkout.iffe.js"></script>
+
 {% for message in messages %}
 <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">{{message}}
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -14,12 +16,12 @@
    <img src="https://raw.githubusercontent.com/Bhupesh8108/Gift-shop/master/media/{{prod.image}}" alt="" class="img-fluid img-thumbnail">
   </div>
   <div class="col-sm-5 offset-sm-1">
-   <h2>{{prod.name}}</h2>
+   <h2  >{{prod.name}}</h2>
    <hr>
    <p>{{prod.description}}</p> 
    <br>
  
-   <h4>{{prod.price}} {% if prod.offer_price > 0 %}<small class="fw-light text-decoration-line-through">{{prod.offer_price}}</small>{% endif %}</h4>
+   <h4 >{{prod.price}} {% if prod.offer_price > 0 %}<small class="fw-light text-decoration-line-through">{{prod.offer_price}}</small>{% endif %}</h4>
    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"><path d="M8.96456 18C8.72194 19.6961 7.26324 21 5.5 21C3.73676 21 2.27806 19.6961 2.03544 18H1V6C1 5.44772 1.44772 5 2 5H16C16.5523 5 17 5.44772 17 6V8H20L23 12.0557V18H20.9646C20.7219 19.6961 19.2632 21 17.5 21C15.7368 21 14.2781 19.6961 14.0354 18H8.96456ZM15 7H3V15.0505C3.63526 14.4022 4.52066 14 5.5 14C6.8962 14 8.10145 14.8175 8.66318 16H14.3368C14.5045 15.647 14.7296 15.3264 15 15.0505V7ZM17 13H21V12.715L18.9917 10H17V13ZM17.5 19C18.1531 19 18.7087 18.5826 18.9146 18C18.9699 17.8436 19 17.6753 19 17.5C19 16.6716 18.3284 16 17.5 16C16.6716 16 16 16.6716 16 17.5C16 17.6753 16.0301 17.8436 16.0854 18C16.2913 18.5826 16.8469 19 17.5 19ZM7 17.5C7 16.6716 6.32843 16 5.5 16C4.67157 16 4 16.6716 4 17.5C4 17.6753 4.03008 17.8436 4.08535 18C4.29127 18.5826 4.84689 19 5.5 19C6.15311 19 6.70873 18.5826 6.91465 18C6.96992 17.8436 7 17.6753 7 17.5Z" fill="rgba(0,153,251,1)"></path></svg>
    : {{delivery_time}}</p> <br>
    {% if request.user.is_authenticated %}
@@ -28,12 +30,16 @@
     <input type="hidden" name="product_id" value ={{prod.id}} id = "product_id">
     <button type="submit" class="btn btn-primary shadow px-5 py-2">{{btn_text}}</button>
    </form>
-   <a href="{% url 'buy-now' %}" class="btn btn-danger shadow px-5 py-2 ms-4">Buy Now</a>
+   <form action="/buy/{{prod.id}}" method="post">
+    {% csrf_token %}
+   <input type="hidden" name="product_id" value ={{prod.id}} id = "product_id">
+   <button class="btn btn-danger shadow px-5 py-2 ms-4" id="payment-button">Buy Now</button>
+  </form>
    {% else  %}
    <form action="/login" class="d-inline">
     <input type="hidden" name="product_id" value ={{prod.id}} id = "product_id">
     <button type="submit" class="btn btn-primary shadow px-5 py-2">Add to cart</button>
-   <button type="submit" class="btn btn-danger shadow px-5 py-2 ms-4">Buy Now</button>
+   <button type="submit" class="btn btn-danger shadow px-5 py-2 ms-4" >Buy Now</button>
 
    </form>
 {% endif %}
@@ -60,4 +66,12 @@
  </div>
 </div>
 
+
+
 {% endblock main-content %}
+
+
+
+
+
+

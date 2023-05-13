@@ -32,6 +32,7 @@
          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
            <li class="nav-item">
              <a class="nav-link active" aria-current="page" href="/">Home</a>
+
            </li>
            <li class="nav-item dropdown">
              <a class="nav-link dropdown-toggle text-white" href="#" id="electronicsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -67,7 +68,12 @@
               {{request.user}}</a>
               <ul class="dropdown-menu" aria-labelledby="profileDropdown">
                 <li><a class="dropdown-item" href="{% url 'profile' %}">Address</a></li>
+                {% if seller %}
+                <li><a class="dropdown-item" href="{% url 'my_product' %}">My product</a></li>
+                <li><a class="dropdown-item" href="{% url 'orders' %}">Add Product</a></li>
+                {% else %}
                 <li><a class="dropdown-item" href="{% url 'orders' %}">Orders</a></li>
+                {% endif %}
                 <li><a class="dropdown-item" href="{% url 'changepassword' %}">Change Password</a></li>
                 <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
                 <!-- <li><a class="dropdown-item" href="">{{request.user.groups}}</a></li>

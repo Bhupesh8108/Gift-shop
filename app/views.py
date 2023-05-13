@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import item, categories, wishlist, order,search,forget_password
 from django.views import View
+from rest_framework.views import APIView
 from .forms import CustomerRegistrationForm, authentication, password_change, customerprofileform, customer,password_reset_form,password_set
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -10,15 +11,23 @@ from ipware import get_client_ip
 from ip2geotools.databases.noncommercial import DbIpCity
 from django.db.models import Q
 from django.urls import reverse
-import uuid
+import uuid,requests
 from django.db.models.functions import Random
 from .logic import send_reset_link,send_order_mail
 import datetime as dt
+from django.db.models import Sum
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+from rest_framework.response import Response
+from django.utils.decorators import method_decorator
+import time
 
 
 def home(request):
     products = item.objects.all().order_by(Random())
-    return render(request, 'app/home.html', {"products": products, "categories": categories})
+    orders_by_product = order.objects.values('product').annotate(total_quantity=Sum('quantity')).order_by('-total_quantity')
+    ids = [product['product'] for product in orders_by_product]
+    return render(request, 'app/home.html', {"trending":ids ,"products":products,"categories": categories})
 
 
 class product_detail(View):
@@ -118,9 +127,6 @@ def removecart(request):
     return JsonResponse(data)
 
 
-def buy_now(request):
-    return render(request, 'app/buynow.html')
-
 
 class profile(View):
     def get(self, request):
@@ -167,7 +173,7 @@ def address(request):
 
 
 def orders(request):
-    cart_items = order.objects.filter(user=request.user)
+    cart_items = order.objects.filter(user=request.user).order_by('-date')
     return render(request, 'app/orders.html',{"cart_items" : cart_items})
 
 
@@ -209,35 +215,19 @@ class customerregistration(View):
 
 
 
-def checkout(request):
-    price,cart_items = update_price(request)
-    shipping_addresses = customer.objects.filter(user=request.user)
-    if request.method == 'POST':
+
+
+class buy_now(View):
+    def post(self, request,id):
+        product_query = item.objects.filter(id=id).first()
         actual_shipping_address_id= request.POST.get('add')
+        shipping_addresses = customer.objects.filter(user=request.user)
         if shipping_addresses and actual_shipping_address_id:
             actual_shipping_address = get_object_or_404(customer,id=actual_shipping_address_id)
-            for item in cart_items:
-                try:
-                    existing_order = get_object_or_404(order,user=request.user,product=item.product,address=actual_shipping_address)
-                    quantity = existing_order.quantity + item.quantity
-                    existing_order.quantity = quantity
-                    existing_order.price = quantity*item.product.price
-                    existing_order.save()                 
-                except:
-                    quantity= item.quantity
-                    orders = order(price=item.product.price*item.quantity,product=item.product,user=request.user,address=actual_shipping_address,quantity=quantity)
-                    orders.save()
-                address = f'{actual_shipping_address.main_address} {actual_shipping_address.street_address} near {actual_shipping_address.additional_address}'
-                # send_order_mail(request.user.email,item.product,quantity,address,actual_shipping_address.phone_number,request.user)
-            wishlist.objects.filter(user=request.user).delete()
-            messages.success(request,'order created successfully')
-
-        else:
-            messages.warning(request,'No shipping addresses selected')
-    price,cart_items = update_price(request)
-    return render(request, 'app/checkout.html',{'cart_items': cart_items, 'shipping_addresses': shipping_addresses,'price': price,'total':price+50})
-
-
+            
+        return render(request, 'app/buynow.html',dict(product = product_query,quantity=1,total=product_query.price+50,shipping_addresses=shipping_addresses))
+        
+        
 
 
 class searchresult(View):
@@ -250,17 +240,15 @@ class searchresult(View):
         ip = get_client_ip(request)[0]
         search(searchtext=search_text,user=username,ip=ip).save()
         search_items = item.objects.filter(Q(name__contains =search_text) | Q(description__contains=search_text))
-        request.session['search_items'] = list(search_items.values())
+        # request.session['search_items'] = list(search_items.values())
         request.session['search_text'] = search_text
-
         return render(request, 'app/searchresult.html',{'search_text': search_text,'search_items':search_items,'x':len(search_items)})
     def post(self, request):
         slider_value = request.POST.get('price_range')
         id_list = []
         search_text = request.session.get('search_text')
-        for id in request.session.get('search_items',[]):
-            id_list.append(id['id'])
-        search_items = item.objects.filter(id__in=id_list,price__lte = slider_value)
+        search_items = item.objects.filter(Q(name__contains =search_text) | Q(description__contains=search_text))
+        search_items = search_items.filter(price__lte = slider_value)
         return render(request, 'app/searchresult.html',{'search_items':search_items,'price_range':slider_value,'search_text': search_text,'x':len(search_items)})
         
 
@@ -323,7 +311,89 @@ class password_set_view(View):
             return render(request, 'app/reset_confirm.html')
          
 
-class test(View):
-    def get(self,request):
-        products = item.objects.all().order_by(Random())
-        return render(request,'app/test.html',dict(products=products))
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class verifypayment(View):
+    def get(self, request, *args, **kwargs):
+        token = request.GET.get('token')
+        amount = request.GET.get('amount')
+        pid = request.GET.get('product_id')
+        add = request.GET.get('address')
+        print (add)
+        print(token, amount, pid)
+        payload = {
+            "token":token,
+            "amount":amount,
+        }
+        headers = {
+            "Authorization": "Key {}".format(settings.KHALTI_SECRET_KEY)
+        }
+
+        response = requests.post(settings.KHALTI_VERIFY_URL,payload,headers=headers).json()
+        if response.get("idx"):
+            success = True
+            products = item.objects.filter(id = pid)
+            actual_shipping_address = customer.objects.filter(id = add).first()
+            address = f'{actual_shipping_address.main_address} {actual_shipping_address.street_address} near {actual_shipping_address.additional_address}'
+            for product in products:
+                order(product=product,user=request.user,quantity = 1,status="Pending",price=product.price,address=actual_shipping_address).save()
+                send_order_mail(request.user.email,product.id,1,address,actual_shipping_address.phone_number,request.user)
+
+        else:
+            success=False
+        data = {"success": success}
+        return JsonResponse(data)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class verifycartpayment(View):
+    def get(self, request, *args, **kwargs):
+        token = request.GET.get('token')
+        amount = request.GET.get('amount')
+        add = request.GET.get('address')
+        payload = {
+            "token":token,
+            "amount":amount,
+        }
+        headers = {
+            "Authorization": "Key {}".format(settings.KHALTI_SECRET_KEY)
+        }
+
+        response = requests.post(settings.KHALTI_VERIFY_URL,payload,headers=headers).json()
+        if response.get("idx"):
+            success = True
+            price,cart_items = update_price(request)
+            print(price+50,amount)
+            actual_shipping_address = customer.objects.filter(id = add).first()
+            for item in cart_items:
+                quantity= item.quantity
+                orders = order(price=item.product.price*item.quantity,product=item.product.id,user=request.user,address=actual_shipping_address,quantity=quantity)
+                orders.save()
+                address = f'{actual_shipping_address.main_address} {actual_shipping_address.street_address} near {actual_shipping_address.additional_address}'
+                send_order_mail(request.user.email,item.product,quantity,address,actual_shipping_address.phone_number,request.user)
+            wishlist.objects.filter(user=request.user).delete()
+
+        else:
+            success=False
+        data = {"success": success}
+        return JsonResponse(data)
+
+
+
+
+def checkout(request):
+    price,cart_items = update_price(request)
+    shipping_addresses = customer.objects.filter(user=request.user)
+    price,cart_items = update_price(request)
+    return render(request, 'app/checkout.html',{'cart_items': cart_items, 'shipping_addresses': shipping_addresses,'price': price,'total':price+50})
+
+
+
+
+
+class my_product(View):
+    def get(self, request):
+        cart_items = item.objects.filter(seller=request.user).order_by('-date')
+        return render(request, 'app/my_product.html',{"cart_items" : cart_items})
+    

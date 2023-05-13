@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = '8o353)z(_*^04+jhey!m*q3_no@vhn*7v8(6xz4rl6=kunu=it'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
+DEBUG = True
 DEBUG = False
 
 
@@ -130,9 +130,13 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # LOGIN_REDIRECT_URL = '/'
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'noreply.giftwan@gmail.com'
-EMAIL_HOST_PASSWORD = 'ghnbxeqjejegjsmi'
+# EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
+# EMAIL_HOST_USER = '09cca6622f8216'
+# EMAIL_HOST_PASSWORD = '1a86082ee4c42e'
+# EMAIL_PORT = '2525'
+KHALTI_SECRET_KEY= 'test_secret_key_ad01a125a531482287d8066ca2554a33'
+KHALTI_SECRET_KEY= 'live_secret_key_5b8ea82add39418888de37e3dcb1f004'
+KHALTI_PUBLIC_KEY = "test_public_key_9dbd355bcbd94b4191284437495a3c47"
+KHALTI_PUBLIC_KEY = "live_public_key_c40a1aff527f45608c86a7858998026e"
+
+KHALTI_VERIFY_URL = "https://khalti.com/api/v2/payment/verify/"
