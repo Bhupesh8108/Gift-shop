@@ -1,7 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import item, categories, wishlist, order,search,forget_password
 from django.views import View
-# from rest_framework.views import APIView
 from .forms import CustomerRegistrationForm, authentication, password_change, customerprofileform, customer,password_reset_form,password_set
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -18,7 +17,6 @@ import datetime as dt
 from django.db.models import Sum
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-# from rest_framework.response import Response
 from django.utils.decorators import method_decorator
 import time
 
