@@ -24,13 +24,13 @@ import plotly.express as px
 from plotly.offline import plot
 import datetime,calendar
 import plotly.graph_objs as go
-from selenium import webdriver
+# from selenium import webdriver
 
 
 def home(request):
-    driver = webdriver.Chrome()
-    driver.get('https://www.tiktok.com')
-    print(driver.title)
+    # driver = webdriver.Chrome()
+    # driver.get('https://www.tiktok.com')
+    # print(driver.title)
     orders_by_product = order.objects.values(
     'product').annotate(total_quantity=Sum('quantity')).order_by('-total_quantity')
     ids = [product['product'] for product in orders_by_product]
