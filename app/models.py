@@ -4,12 +4,12 @@ from django.core.validators import MaxValueValidator,MinValueValidator
 import os,datetime
 from django.utils import timezone
 categories = [
-    ('Birthday', 'hbd'),
-    ('Electronic','elt'),
-    ('Anniversary','anv'),
-    ('Flowers','flw'),
-    ('Chocolate','clt'),
-    ('Jewels','jwl')
+    ('hbd','Birthday'),
+    ('elt','Electronic'),
+    ('anv','Anniversary'),
+    ('flw','Flowers'),
+    ('clt','Chocolate'),
+    ('jwl','Jewels'),
 ]
 options = {
     ('Pending','Pending'),
@@ -25,7 +25,7 @@ def upload_path(instance, filename):
 
 class item(models.Model):
     date = models.DateTimeField(auto_now_add=True)
-    name = models.CharField(max_length=56,default = None)
+    name = models.CharField(max_length=25,default = None)
     description = models.CharField(max_length=500,default = " Good quality product")
     image = models.ImageField(upload_to=upload_path)
     price = models.IntegerField()
@@ -33,6 +33,7 @@ class item(models.Model):
     category = models.CharField(choices=categories,max_length=20)
     id = models.AutoField(primary_key=True)
     seller = models.ForeignKey(User, on_delete=models.CASCADE ,default="26")
+    active = models.BooleanField(default=True)
 
     def __str__(self):
         return str(f'{self.name}({self.id})')
@@ -56,7 +57,7 @@ class customer(models.Model):
     street_address= models.CharField(max_length=200)
     additional_address = models.CharField(max_length=200)
     country = models.CharField(max_length=20 , default='unknown')
-    phone_number = models.IntegerField(validators=[MaxValueValidator(9999999999),MinValueValidator(9000000000)])
+    phone_number = models.BigIntegerField(validators=[MaxValueValidator(9999999999),MinValueValidator(9000000000)])
     def __str__ (self):
         return f'{self.name} {self.user}  {self.country}'
     

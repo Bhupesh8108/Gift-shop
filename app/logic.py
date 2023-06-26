@@ -1,5 +1,16 @@
 from django.core.mail import send_mail
 import requests
+from django import template
+
+register = template.Library()
+
+@register.filter(name='div')
+def div(value, arg):
+    try:
+        return float(value) / float(arg)
+    except (ValueError, ZeroDivisionError):
+        return None
+    
 def send_reset_link(token,email):
     subject = "Password reset link"
     message = f"""Here is the link to reset you password Please follow instructions to

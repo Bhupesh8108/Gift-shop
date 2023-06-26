@@ -29,7 +29,7 @@ DEBUG = True
 
 
 ALLOWED_HOSTS = ['giftwan.pythonanywhere.com']
-# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -80,10 +80,20 @@ WSGI_APPLICATION = 'shoppinglyx.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'giftshop',
+        'USER': 'postgres',
+        'PASSWORD': 'kali',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
     }
 }
 
@@ -138,5 +148,4 @@ KHALTI_SECRET_KEY= 'test_secret_key_ad01a125a531482287d8066ca2554a33'
 KHALTI_SECRET_KEY= 'live_secret_key_5b8ea82add39418888de37e3dcb1f004'
 KHALTI_PUBLIC_KEY = "test_public_key_9dbd355bcbd94b4191284437495a3c47"
 KHALTI_PUBLIC_KEY = "live_public_key_c40a1aff527f45608c86a7858998026e"
-
 KHALTI_VERIFY_URL = "https://khalti.com/api/v2/payment/verify/"

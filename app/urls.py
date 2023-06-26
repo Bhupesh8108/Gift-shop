@@ -13,6 +13,7 @@ urlpatterns = [
     path('profile/', views.profile.as_view(), name='profile'),
     path('address/', views.address, name='address'),
     path('orders/', views.orders, name='orders'),
+    path('my_orders/', views.my_orders.as_view(), name='my_orders'),
     path('changepassword/', views.change_password , name='changepassword'),
     path('category/<category>', views.category, name='category'),
     path('login/', views.login, name='login'),
@@ -25,6 +26,13 @@ urlpatterns = [
     path('password-set/<token>',views.password_set_view.as_view(),name='password_set'),
     path('verifypayment',views.verifypayment.as_view(),name='verifypayment'),
     path('verifycartpayment',views.verifycartpayment.as_view(),name='verifycartpayment'),
+    path('top-product',views.top_product.as_view(),name='top-product'),
+    path('update_status',views.update_status.as_view(),name='update_status'),
+    path('update_product_status/',views.update_product_status.as_view(),name='update_product_status'),
+    path('my_product_filter',views.my_product_filter.as_view(),name='my_product_filter'),
+    path('stats/',views.stats.as_view(),name='stats'),
+    path('add_product',views.add_product.as_view(),name='add_product'),
+
     # path('resetpassword/',views.reset_password.as_view(),name='password_reset'),
     # path('resetpassword/done/',auth_views.PasswordResetDoneView.as_view(
     # template_name = 'app/reset_done.html'), name='password_reset_done'),

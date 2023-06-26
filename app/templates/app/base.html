@@ -70,7 +70,11 @@
                 <li><a class="dropdown-item" href="{% url 'profile' %}">Address</a></li>
                 {% if seller %}
                 <li><a class="dropdown-item" href="{% url 'my_product' %}">My product</a></li>
-                <li><a class="dropdown-item" href="{% url 'orders' %}">Add Product</a></li>
+                <li><a class="dropdown-item" href="{% url 'add_product' %}">Add Product</a></li>
+                <li><a class="dropdown-item" href="{% url 'my_orders' %}">My order</a></li>
+                <li><a class="dropdown-item" href="{% url 'stats' %}">Statistics</a></li>
+
+
                 {% else %}
                 <li><a class="dropdown-item" href="{% url 'orders' %}">Orders</a></li>
                 {% endif %}

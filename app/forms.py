@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm,AuthenticationForm,UsernameField,PasswordChangeForm,PasswordResetForm,SetPasswordForm
 from django.contrib.auth.models import User
 from django.contrib.auth import password_validation
-from .models import customer
+from .models import customer,item
 class CustomerRegistrationForm(UserCreationForm):
     email= forms.CharField(required=True, widget = forms.EmailInput(attrs={'class': 'form-control'}))
     password1= forms.CharField(label='Password', widget = forms.PasswordInput(attrs={'class': 'form-control'}))
@@ -50,3 +50,16 @@ class password_set(SetPasswordForm):
     new_password1 = forms.CharField(label= "New Password",strip=False,widget=forms.PasswordInput(attrs={'autocomplete': 'new-password','autofocus': 'Ture',"class":'form-control'}))
     new_password2  = forms.CharField(label= "Confirm New Password",strip=False,widget=forms.PasswordInput(attrs={'autocomplete': 'new-password','autofocus': 'Ture',"class":'form-control'}))
 
+
+class add_product_form(forms.ModelForm):
+    class Meta:
+        model = item
+        fields = ['name','description','price','offer_price','category','image']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control'}),
+            'price': forms.NumberInput(attrs={'class': 'form-control'}),
+            'offer_price': forms.NumberInput(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-control'}),
+            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        }

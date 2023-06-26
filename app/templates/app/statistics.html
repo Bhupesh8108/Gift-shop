@@ -1,0 +1,95 @@
+
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}Buy Now{% endblock title %}
+{% block main-content %}
+
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<h1 class = "mx-4" style="color:blue">Seller Dashboard </h1><hr>
+<div class="row">
+  <div class="col" style="color:green">
+    <div class="col-md">
+      <div class="card text-center test-white mb-3">
+        <div class="card-header">
+          <h5>Total order</h5>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">$ {{total_price}} <small>({{total_order}})</small></h3>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="col" style="color:green">
+    <div class="col-md">
+      <div class="card text-center test-white mb-3">
+
+        <div class="card-header">
+          <h5> Delivered</h5>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">$ {% if delivered_price %}{{delivered_price}}{%else %} 0 {% endif %}<small>({{delivered_list}})</small></h3>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+   <div class="col" style="color:green">
+    <div class="col-md">
+      <div class="card text-center test-white mb-3">
+
+        <div class="card-header">
+          <h5>Pending </h5>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">$ {{pending_price}}<small>({{pending_list}})</small></h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<br>
+
+<div>
+  {{ chart|safe }}
+</div>
+<div>
+  {{ pie_chart|safe }}
+</div>
+
+<div class="container">
+  <h1 class="d-inline" >Top Products</h1>
+  <a class="d-inline text-decoration-none" href="/top-product" style="margin-left: 80%; font-size: large; color: blueviolet;"> View all</a>
+  <table class="table table-striped">
+      <thead>
+          <tr>
+              <th>Product</th>
+              <th>Total Sales</th>
+          </tr>
+      </thead>
+      <tbody>
+        {% for id,total in top_products.items %}
+        {% for product   in products %}
+        {% if product.id == id %}
+              <tr>
+                  <td><a class="text-decoration-none" href="/product-detail/{{product.id}}">{{product.name}} <img src="{{ product.image.url }}" alt="{{ product.name }}" width="50"></a></td>
+                  <td>{{ total}}</td>
+              </tr>
+              {% endif %}
+          {% endfor %}
+          {% endfor %}
+      </tbody>
+  </table>
+</div>
+{% endblock %}
+<!-- <a style="color:blueviolet; font-size:x-large; text-decoration: none;" class = "mx-3" href="/stats">View other report</a><hr> -->
+
+
+
+
+
+
+

@@ -1,0 +1,32 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}Home{% endblock title %}
+{% block main-content %}
+{% for message in messages %}
+<div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+ {{message}}
+ <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+ {% endfor %}
+<form action="" method="post" enctype="multipart/form-data">
+   {% csrf_token %}
+   {% if form.errors %}
+{% for field,errors in form.errors.items %}
+{% for error in errors %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">{{error}}
+   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+ </div>
+{% endfor %}
+{% endfor %}
+{% endif %}
+{% for fm in form %}
+<div class="form-group mb-3">
+   {{fm.label_tag}}{{fm}} <small class="text-danger"> {{fm.errors| striptags}}</small>
+</div>
+{% endfor %}
+
+
+<button class = "btn btn-outline-warning" >Add Product</button>
+</form>
+
+{% endblock main-content %}

@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import item, categories, wishlist, order,search,forget_password
 from django.views import View
-from .forms import CustomerRegistrationForm, authentication, password_change, customerprofileform, customer,password_reset_form,password_set
+from .models import item, categories, wishlist, order,search,forget_password
+from .forms import CustomerRegistrationForm, authentication, password_change, customerprofileform, customer,password_reset_form,password_set,add_product_form
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import JsonResponse
@@ -18,14 +18,24 @@ from django.db.models import Sum
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.utils.decorators import method_decorator
-import time
+import pandas as pd
+from django.db import transaction
+import plotly.express as px
+from plotly.offline import plot
+import datetime,calendar
+import plotly.graph_objs as go
+from selenium import webdriver
 
 
 def home(request):
-    products = item.objects.all().order_by(Random())
-    orders_by_product = order.objects.values('product').annotate(total_quantity=Sum('quantity')).order_by('-total_quantity')
+    driver = webdriver.Chrome()
+    driver.get('https://www.tiktok.com')
+    print(driver.title)
+    orders_by_product = order.objects.values(
+    'product').annotate(total_quantity=Sum('quantity')).order_by('-total_quantity')
     ids = [product['product'] for product in orders_by_product]
-    return render(request, 'app/home.html', {"trending":ids ,"products":products,"categories": categories})
+    return render(request, 'app/home.html', {
+    "trending":ids,"categories": categories})
 
 
 class product_detail(View):
@@ -37,7 +47,7 @@ class product_detail(View):
             btn_text = "Remove from cart"
         else:
             btn_text = "Add to cart"
-        return render(request, 'app/productdetail.html', {'prod': prod, "products": products,'btn_text': btn_text})
+        return render(request, 'app/productdetail.html', {'prod': prod,'btn_text': btn_text})
 
     def post(self,request,id):
         product = item.objects.get(id=id)
@@ -83,7 +93,8 @@ def pluscart(request):
             items = get_object_or_404(wishlist, product=pid, user=request.user)
             items.quantity += 1
             items.save()
-            price, cart_items = update_price(request)
+            price, _ = update_price(request)
+            print(price)
             data = {'quantity': items.quantity,
             'price': price,
             'total': price+50}
@@ -93,6 +104,7 @@ def pluscart(request):
 def minuscart(request):
     if request.method == 'GET':
         pid = request.GET.get('produc_id')
+
         if pid:
             items = get_object_or_404(wishlist, product=pid, user=request.user)
             items.quantity -= 1
@@ -100,13 +112,14 @@ def minuscart(request):
             if items.quantity <= 0:
                 wishlist.objects.filter(
                     product=pid, user=request.user).delete()
+                return redirect('cart')
 
-    price, cart_items = update_price(request)
-    data = {'quantity': items.quantity,
-            'price': price,
-            'total': price+50,
-            }
-    return JsonResponse(data)
+            price,_ = update_price(request)
+            data = {'quantity': items.quantity,
+                    'price': price,
+                    'total': price+50,
+                }
+            return JsonResponse(data)
 
 
 def removecart(request):
@@ -237,15 +250,14 @@ class searchresult(View):
             username = get_object_or_404(User, username='anonymous')
         ip = get_client_ip(request)[0]
         search(searchtext=search_text,user=username,ip=ip).save()
-        search_items = item.objects.filter(Q(name__contains =search_text) | Q(description__contains=search_text))
+        search_items = item.objects.filter(Q(name__icontains =search_text) | Q(description__icontains=search_text))
         # request.session['search_items'] = list(search_items.values())
         request.session['search_text'] = search_text
         return render(request, 'app/searchresult.html',{'search_text': search_text,'search_items':search_items,'x':len(search_items)})
     def post(self, request):
         slider_value = request.POST.get('price_range')
-        id_list = []
         search_text = request.session.get('search_text')
-        search_items = item.objects.filter(Q(name__contains =search_text) | Q(description__contains=search_text))
+        search_items = item.objects.filter(Q(name__icontains =search_text) | Q(description__icontains=search_text))
         search_items = search_items.filter(price__lte = slider_value)
         return render(request, 'app/searchresult.html',{'search_items':search_items,'price_range':slider_value,'search_text': search_text,'x':len(search_items)})
         
@@ -395,3 +407,126 @@ class my_product(View):
         cart_items = item.objects.filter(seller=request.user).order_by('-date')
         return render(request, 'app/my_product.html',{"cart_items" : cart_items})
     
+class  top_product(View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            products = item.objects.all().order_by(Random())
+            item_list = item.objects.filter(seller = request.user)
+            item_data = list(item_list.values())
+            item_df = pd.DataFrame(item_data)
+            product_ids = order.objects.filter(product__in = item_list)
+            order_list = order.objects.filter(id__in = product_ids)
+            order_data = list(order_list.values())
+            order_df = pd.DataFrame(order_data)
+            joint_table = pd.merge(item_df,order_df, left_on='id',right_on='product_id')
+            total_sales = joint_table.price_y.sum()
+            top_product_list =joint_table.groupby('product_id')[['price_y','quantity']].sum().sort_values(by='price_y',ascending=False)
+            sales_mix = (top_product_list.values/total_sales*100).round(2)
+            return render(request,'app/top_product.html',dict(top_products = top_product_list.to_dict(),products=products,sales_mix=sales_mix))
+
+
+class my_orders(View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            item_list = item.objects.filter(seller = request.user)
+            product_list = order.objects.filter(product__in = item_list).order_by("-date")
+            return render(request, 'app/my_order.html',{"cart_items" : product_list})
+
+
+class update_status(View):
+    def get(self, request):
+            status = request.GET.get('productStatus')
+            item_list = item.objects.filter(seller = request.user)
+            item_data = list(item_list.values())
+            item_df = pd.DataFrame(item_data)
+            product_ids = order.objects.filter(product__in = item_list)
+            if status == "delivered":
+                cart_items= order.objects.filter(id__in = product_ids,status = "Delivered")
+                
+            elif status == "pending":
+                cart_items= order.objects.filter(id__in = product_ids,status = "Pending")
+
+            else:
+                cart_items= order.objects.filter(id__in = product_ids)
+
+            return render(request,'app/my_order.html',dict(cart_items=cart_items))    
+class update_product_status(View):
+    def get(self, request):
+        pid = request.GET.get('productId')
+        product = get_object_or_404(item,id=pid)
+        if product.active :
+            product.active = False
+        else :
+            product.active = True
+        product.save()
+        data = {'id':product.id, 'status':product.active}
+        return JsonResponse(data)
+        
+        
+        
+    
+class my_product_filter(View):
+    def get(self, request) -> JsonResponse:
+        status = request.GET.get('productStatus')
+        if status == 'active':
+            products = item.objects.filter(active=True,seller=request.user)
+        elif status == 'inactive':
+            products = item.objects.filter(active=False,seller=request.user)
+        else:
+            products = item.objects.filter(seller=request.user)
+        return render(request,'app/my_product.html',{"cart_items":products})
+
+    
+class stats(View):
+    def get(self, request):
+        # products = item.objects.filter(active=True).all().order_by(Random())
+        all_products = item.objects.all().order_by(Random())
+        orders_by_product = order.objects.values('product').annotate(total_quantity=Sum('quantity')).order_by('-total_quantity')
+        ids = [product['product'] for product in orders_by_product]
+        if request.user.is_authenticated:
+            item_list = item.objects.filter(seller = request.user)
+            item_data = list(item_list.values())
+            item_df = pd.DataFrame(item_data)
+            product_ids = order.objects.filter(product__in = item_list)
+            order_list = order.objects.filter(id__in = product_ids)
+            order_data = list(order_list.values())
+            order_df = pd.DataFrame(order_data)
+            joint_table = pd.merge(order_df,item_df , left_on='product_id',right_on='id')
+            top_product_list =joint_table.groupby('product_id')['price_x'].sum().sort_values(ascending=False)
+            delivered_list = len(order_df.query('status == "Delivered"'))
+            pending_list = len(order_df.query('status == "Pending"'))
+            total_price = order_df.price.sum()
+            delivered_price = order_df.query('status == "Delivered"').price.sum()
+            pending_price = order_df.query('status == "Pending"').price.sum()
+            order_df['day'] = order_df['date'].dt.date
+            #plotting pie chart 
+            categories_sales = joint_table.groupby('category')['price_x'].sum()
+            pie_chart = px.pie(values=categories_sales.values,names=categories_sales.index,title="Sales by category",hole=.5)
+            pie_chart = plot(pie_chart, output_type='div', include_plotlyjs=False,config = {'staticPlot': False})
+            # plotting in graph
+            date_sales = []
+            sum_by_date = order_df.groupby('day')['price'].sum()
+            current_time  = datetime.date.today()
+            first_day = current_time -datetime.timedelta(days=30)
+            daterange = pd.date_range(start = first_day,periods=31)
+            for day in daterange:
+                if day.date() in sum_by_date.index:
+                    
+                    date_sales.append(sum_by_date[day.date()])
+                else:
+                    date_sales.append(0)
+            graph = px.line(x=daterange,y=date_sales,markers=True,line_shape='spline').update_layout(xaxis_title="", yaxis_title="Sales")
+            chart = plot(graph, output_type='div', include_plotlyjs=False,config = {'staticPlot': False})
+            return render(request, 'app/statistics.html', dict(trending=ids,categories=categories,products=all_products,total_order=len(order_list),delivered_list=delivered_list,pending_list=pending_list,total_price = total_price,pending_price = pending_price,delivered_price=delivered_price,chart=chart,top_products = top_product_list[:3].to_dict(),pie_chart=pie_chart))
+        
+class add_product(View):
+    def get(self, request):
+        return render(request,'app/add_product.html',{'form':add_product_form})
+    def post(self, request):
+        form = add_product_form(request.POST,request.FILES)
+        print(form)
+        if form.is_valid():
+            print('saved')
+            form.save()
+            messages.success(request,'Product added successfully')
+        return redirect('add_product')

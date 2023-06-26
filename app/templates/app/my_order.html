@@ -1,0 +1,68 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}Buy Now{% endblock title %}
+{% block main-content %}
+<div class="container my-5">
+ <div class="row">
+ <h3>Welcome {{request.user.username}}</h3>
+  <!-- <div class="col-sm-2 border-end">
+   <ul class="list-unstyled">
+    <li class="d-grid"><a href="{% url 'my_orders' %}" class="btn btn-outline-primary" style="background-color:blueviolet; color:white;">All Orders</a></li>
+    <li class="d-grid"><a href="{% url 'my_orders' %}" class="btn btn-outline-primary" style="background-color:orangered; color:white;">Pending Orders</a></li>
+    <li class="d-grid"><a href="{% url 'my_orders' %}" class="btn btn-outline-primary" style="background-color:gray; color:white;">Delivered Orders</a></li>
+
+   </ul>
+  </div> -->
+  <form  action="/update_status" method="get">
+    <div class="form-group">
+      <label for="productStatus">Select Product Status:</label>
+      <select class="form-control" name="productStatus">
+        <option value="delivered">Delivered Product</option>
+        <option value="pending">Pending Product</option>
+        <option value="all" selected>All Product</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Apply Filter</button>
+  </form>
+  
+  {% if cart_items %}
+  {% for item in cart_items %}
+  <div class="row">
+   <div class="col-sm-3 text-center align-self-center"><img src="/media/{{item.product.image}}" alt="" srcset="" class="img-fluid img-thumbnail shadow-sm" height="150" width="150"> </div>
+   <div class="col-sm-9">
+    
+    <div>
+      <a href="/product-detail/{{item.product.id}}" class="text-decoration-none"><h5>{{item.product.name}}</h5></a>
+     <div class="my-3">
+      <label for="quantity">Quantity:{{item.quantity}}</label>
+      <label style = "margin-left: 80px;" for="id">Order Id: {{item.id}}</label>
+     </div> 
+     <div class="d-flex justify-content-between">
+      <p class="mb-0"><span><strong>Price : Rs. {{item.product.price}}</strong></span></p><br>
+      <p class="mb-0"><span><strong>Date :{{item.date.date}}</strong></span></p><br>
+
+      {% if item.status == 'Pending' %}
+      <p class="text-danger"> Status : {{item.status}}</p>
+      {% elif item.status == 'Accepted' %}
+      <p class="text-warning"> Status : {{item.status}}</p>
+      {% elif item.status == 'Delivered' %}
+      <p class="text-success"> Status : {{item.status}}</p>
+      {% endif %}
+
+
+     </div>
+    </div>
+   </div>
+  </div> <hr>{% endfor %}
+  {% else %}
+  <div class="card">
+    <div class="card-body">
+  <h5> No order found</h5>
+  <a href="/cart" class="btn btn-warning">Go to cart</a>
+  </div></div>
+  {% endif %}
+
+
+ </div>
+</div>
+{% endblock main-content %}

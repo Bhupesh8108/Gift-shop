@@ -1,4 +1,4 @@
-from .models import wishlist
+from .models import wishlist,item
 from django.contrib.auth.models import Group
 from datetime import datetime,timedelta
 def common_data(request):
@@ -9,7 +9,9 @@ def common_data(request):
     else:
         nocart = 0
         group_user = None
-    return{'nocart':nocart,"seller":group_user}
+    productslist  = item.objects.filter(active = True)
+    wishlists = wishlist.objects.all()
+    return{'nocart':nocart,"seller":group_user,'products':productslist,'wishlists':wishlists}
 
 def delivery_time(request):
     utc_time = datetime.today()

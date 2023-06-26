@@ -1,0 +1,36 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Home{% endblock title %}
+
+{% block banner_slider %}
+<div class="container">
+    <h1 class="d-inline" >Top Products</h1><br>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Total Sales</th>
+                <th> Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+          {% for id,total in top_products.price_y.items %}
+          {% for product in products %}
+          {% if product.id == id %}
+                <tr>
+                    <td><a class="text-decoration-none" href="/product-detail/{{product.id}}">{{product.name}} <img src="{{ product.image.url }}" alt="{{ product.name }}" width="50"></a></td>
+                    <td>{{ total}}</td>
+                    {% for id2,total2 in top_products.quantity.items %}
+                    {% if id2 == id %}
+                    <td> {{total2}}</td>
+                    {% endif %}
+                    {% endfor %}
+                </tr>
+                {% endif %}
+            {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+  </div>
+{% endblock banner_slider %}
